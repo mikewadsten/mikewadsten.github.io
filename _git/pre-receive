@@ -1,0 +1,48 @@
+#!/usr/bin/env bash
+# Git server-side hook to attempt (and deploy, if doable) a Jekyll build of this repo
+# on push, emulating Github Pages somewhat.
+
+# Gracias to http://codeutopia.net/blog/2011/06/30/how-to-automatically-run-unit-tests-from-a-git-push/
+
+SITEDIR=/var/www/blog
+
+activate_ruby_230() {
+    # Update as necessary to invoke rbenv
+    /usr/bin/rbenv local 2.3.0
+}
+run_jekyll() {
+    # Update as necessary to point to Jekyll executable
+    $HOME/.rbenv/shims/jekyll $@
+}
+
+while read oldrev newrev refname
+do
+    # Only trigger the build for the master branch
+    if [[ $refname =~ .*/master$ ]]
+    then
+        echo "Master ref received. This is where I would build the blog..."
+
+        # Make a temporary directory for build
+        BUILDDIR=$(mktemp --tmpdir -d tmp.blog.XXX)
+        trap "rm -rf $BUILDDIR" EXIT
+
+        # Since this repo is bare, we need to put the actual files someplace,
+        # so we use the build directory we just set up.
+        git archive $newrev | tar -x -C $BUILDDIR
+
+        cd $BUILDDIR
+        set -e
+        set -o pipefail
+        # Use ruby 2.3.0
+        activate_ruby_230
+
+        # Run the build (indenting all output)
+        echo "Generating blog..."
+        echo
+        run_jekyll build 2>&1 | sed -e 's/^/    /'
+
+        echo
+        echo "Deploying built site to $SITEDIR..."
+        /usr/bin/rsync -a --prune-empty-dirs --delete ./_site/ $SITEDIR
+    fi
+done
