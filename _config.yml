@@ -1,0 +1,23 @@
+highlighter: pygments
+permalink: pretty
+markdown: kramdown
+
+title: Mike Wadsten
+name: Mike Wadsten's Personal Site
+url: http://mikewadsten.com
+
+author: Mike Wadsten
+
+css:
+    - stylesheets/styles.css
+    - stylesheets/pygment_trac.css
+    - //fonts.googleapis.com/css?family=Noto+Sans:400,400italic,700italic,700
+
+exclude:
+    - CNAME
+    - Gemfile
+    - Gemfile.lock
+    - Guardfile
+    - LICENSE
+    - README.md
+    - vendor
