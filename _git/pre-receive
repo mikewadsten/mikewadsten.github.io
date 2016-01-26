@@ -20,8 +20,6 @@ do
     # Only trigger the build for the master branch
     if [[ $refname =~ .*/master$ ]]
     then
-        echo "Master ref received. This is where I would build the blog..."
-
         # Make a temporary directory for build
         BUILDDIR=$(mktemp --tmpdir -d tmp.blog.XXX)
         trap "rm -rf $BUILDDIR" EXIT
